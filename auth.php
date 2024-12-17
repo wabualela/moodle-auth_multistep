@@ -221,11 +221,10 @@ class auth_plugin_multistep extends auth_plugin_base
         {
         global $CFG;
 
-        require_once $CFG->dirroot . '/auth/multistep/multistep_form.php';
+        require_once "$CFG->dirroot/auth/multistep/signup_form.php";
 
-        return new multistep_signup_form();
+        return new login_signup_form(null, null, 'post', '', array('autocomplete' => 'yes'));
         }
-
 
     function prevent_local_passwords()
         {

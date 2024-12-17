@@ -33,3 +33,8 @@ $string['username']       = 'Username';
 $string['password']       = 'Password';
 $string['phone']          = 'Phone';
 $string['accountcreated'] = 'Your account has been created successfully.';
+
+$string['nationality'] = 'Nationality';
+$string['education']   = 'Education';
+$string['speciality']  = 'Speciality';
+$string['job']         = 'Job';

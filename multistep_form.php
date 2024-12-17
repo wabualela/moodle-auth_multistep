@@ -24,7 +24,7 @@
 
 require_once("$CFG->libdir/formslib.php");
 
-class multistep_signup_form extends moodleform
+class _signup_form extends moodleform
     {
     protected $step;
 
