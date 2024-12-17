@@ -22,16 +22,64 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require '../../config.php';
-require_once "$CFG->libdir/formslib.php";
+require_once("$CFG->libdir/formslib.php");
 
-require_login();
+class multistep_signup_form extends moodleform
+    {
+    protected $step;
 
+    public function definition()
+        {
+        global $CFG;
 
-$url = new moodle_url('/auth/multistep/multistep_form.php', []);
-$PAGE->set_url($url);
-$PAGE->set_context(context_system::instance());
+        $mform      = $this->_form;
+        $this->step = optional_param('step', 1, PARAM_INT);
 
-$PAGE->set_heading($SITE->fullname);
-echo $OUTPUT->header();
-echo $OUTPUT->footer();
+        switch ($this->step) {
+            case 1:
+                $this->add_step1_fields($mform);
+                break;
+
+            case 2:
+                $this->add_step2_fields($mform);
+                break;
+
+            case 3:
+                $this->add_step3_fields($mform);
+                break;
+            }
+
+        // Add navigation buttons
+        $mform->addElement('hidden', 'step', $this->step + 1);
+        $mform->setType('step', PARAM_INT);
+        $mform->addElement('submit', 'next', get_string('next', 'auth_multistep'));
+        }
+
+    private function add_step1_fields(&$mform)
+        {
+        $mform->addElement('text', 'firstname', get_string('firstname'));
+        $mform->setType('firstname', PARAM_NOTAGS);
+        $mform->addRule('firstname', null, 'required', null, 'client');
+
+        $mform->addElement('text', 'lastname', get_string('lastname'));
+        $mform->setType('lastname', PARAM_NOTAGS);
+        $mform->addRule('lastname', null, 'required', null, 'client');
+        }
+
+    private function add_step2_fields(&$mform)
+        {
+        $mform->addElement('text', 'username', get_string('username'));
+        $mform->setType('username', PARAM_USERNAME);
+        $mform->addRule('username', null, 'required', null, 'client');
+
+        $mform->addElement('password', 'password', get_string('password'));
+        $mform->setType('password', PARAM_RAW);
+        $mform->addRule('password', null, 'required', null, 'client');
+        }
+
+    private function add_step3_fields(&$mform)
+        {
+        $mform->addElement('text', 'phone', get_string('phone', 'auth_multistep'));
+        $mform->setType('phone', PARAM_TEXT);
+        }
+    }

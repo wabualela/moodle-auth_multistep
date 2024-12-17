@@ -15,21 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English language pack for Multi Step Signup form
+ * TODO describe file lib
  *
  * @package    auth_multistep
- * @category   string
- * @copyright  2024 Wail Abualela wailabualela@hotmail.com
+ * @copyright  2024 Wail Abualela wailabualela@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$string['pluginname']     = 'Multi-Step Signup Form';
-$string['next']           = 'Next';
-$string['firstname']      = 'First Name';
-$string['lastname']       = 'Last Name';
-$string['username']       = 'Username';
-$string['password']       = 'Password';
-$string['phone']          = 'Phone';
-$string['accountcreated'] = 'Your account has been created successfully.';
