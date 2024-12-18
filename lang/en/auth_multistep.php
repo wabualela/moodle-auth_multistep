@@ -34,7 +34,15 @@ $string['password']       = 'Password';
 $string['phone']          = 'Phone';
 $string['accountcreated'] = 'Your account has been created successfully.';
 
+// form1
+$string['gender'] = 'Gender';
 $string['nationality'] = 'Nationality';
+
+// form2
+$string['dateofbirth'] = 'Date of birth';
+
+// form3
 $string['education']   = 'Education';
 $string['speciality']  = 'Speciality';
 $string['job']         = 'Job';
+$string['fullname']    = 'Full Name (Will be used for certification)';

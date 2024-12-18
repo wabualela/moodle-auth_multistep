@@ -69,23 +69,11 @@ class login_signup_form extends moodleform implements renderable, templatable
         return $context;
         }
 
-    /* 
-       Basic fields
-       - First name
-       - Last name
-       - sex
-       - nationality
-       - County
-       - City
-       - Date of birth
-       - Marital status
-    */
     public function step1_fields(&$mform)
         {
         global $CFG;
 
-        //First name
-        //Last name
+        //First name & Last name
         $namefields = useredit_get_required_name_fields();
         foreach ($namefields as $field) {
             $mform->addElement('text', $field, get_string($field), 'maxlength="100" size="30"');
@@ -98,6 +86,9 @@ class login_signup_form extends moodleform implements renderable, templatable
             }
 
         //sex
+        $sex = ['ذكر', 'انثي'];
+        $mform->addElement('select', 'sex', get_string('gender', 'auth_multistep'), $sex, ['style' => 'width:100%']);
+
         //nationality
         $nationality             = get_string_manager()->get_list_of_countries();
         $default_nationality[''] = get_string('selectacountry');
@@ -110,6 +101,7 @@ class login_signup_form extends moodleform implements renderable, templatable
             $mform->setDefault('nationality', '');
             }
         //Date of birth
+        $mform->addElement('date_selector', 'assesstimefinish', get_string('dateofbirth', 'auth_multistep'));
         //Marital status
         $marital_status = ['male', 'female'];
         $mform->addElement('select', 'country', get_string('country'), $marital_status, ['style' => 'width:100%']);
@@ -175,24 +167,22 @@ class login_signup_form extends moodleform implements renderable, templatable
         $mform->addElement('hidden', 'step', $this->step + 1);
         $mform->setType('step', PARAM_INT);
 
-        // buttons
+        // buttons        
         $this->set_display_vertical();
-        $mform->addElement('submit', 'next', get_string('next', 'auth_multistep'));
-
-        // $this->add_action_buttons(true, get_string('next', 'auth_multistep'));
+        $this->add_action_buttons(true, get_string('next', 'auth_multistep'));
 
         }
 
-    /* 
-      Platform fields
-      - full name (certificaitons)
-      - email
-      - password
-      - username
-      - site policy
-   */
     public function step3_fields(&$mform)
         {
+
+        // full name (certificaitons)
+        $mform->addElement('float', 'fullname', get_string('fullname', 'auth_multistep'), ['maxlength' => '120', 'size' => '20', 'style' => 'width:100%']);
+        $mform->setType('fullname', PARAM_TEXT);
+        //- email
+        //- password
+        //- username
+        //- site policy
 
         }
     }
