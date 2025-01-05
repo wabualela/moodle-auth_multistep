@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component    = 'auth_multistep';
 $plugin->release      = '1.0';
-$plugin->version      = 2024121700;
+$plugin->version      = 2025010500;
 $plugin->requires     = 2024100700;
 $plugin->supported    = [405, 405];
 $plugin->maturity     = MATURITY_STABLE;

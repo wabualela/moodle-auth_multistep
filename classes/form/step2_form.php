@@ -33,9 +33,12 @@ require_once "$CFG->dirroot/auth/multistep/lib.php";
  */
 class step2_form extends moodleform implements renderable, templatable {
     protected function definition() {
-        global $CFG, $USER, $SESSION;
+        global $CFG, $SITE;
 
         $mform = $this->_form;
+
+        $mform->addElement('html', "<h1 class=\"login-heading mb-4\">{$SITE->fullname}</h1>");
+        $mform->addElement('html', "<hr>");
 
         profile_signup_fields_by_shortnames($mform, ['dob', 'marital_status', 'gender']);
 
@@ -62,6 +65,7 @@ class step2_form extends moodleform implements renderable, templatable {
             $mform->setDefault('city', $CFG->defaultcity);
         }
 
+        $mform->addElement('html', "<hr>");
         $this->add_action_buttons(true, get_string('next'));
 
     }

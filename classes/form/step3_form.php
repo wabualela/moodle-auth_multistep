@@ -27,10 +27,13 @@ require_once "$CFG->libdir/formslib.php";
  */
 class step3_form extends \moodleform {
     protected function definition() {
-        global $CFG;
+        global $CFG, $SITE;
 
         $mform = $this->_form;
-        $mform->addElement('html', '<h1>المعلومات الأكاديمية</h1>');
+
+        $mform->addElement('html', "<h1 class=\"login-heading mb-4\">{$SITE->fullname}</h1>");
+        $mform->addElement('html', "<hr>");
+
         profile_signup_fields_by_shortnames($mform, ['certname', 'education_level', 'current_job']);
 
         $manager = new \core_privacy\local\sitepolicy\manager();
@@ -40,6 +43,7 @@ class step3_form extends \moodleform {
         }
         $manager->signup_form($mform);
 
+        $mform->addElement('html', "<hr>");
         $this->add_action_buttons(true, get_string('submit'));
 
     }

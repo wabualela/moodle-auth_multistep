@@ -29,14 +29,15 @@ require_once "$CFG->dirroot/user/profile/lib.php";
 require_once "$CFG->dirroot/user/editlib.php";
 require_once "lib.php";
 
-class login_signup_form extends moodleform implements renderable, templatable {
+class login_signup_form extends moodleform {
 
     public function definition() {
-        global $USER, $CFG, $SESSION;
+        global $USER, $CFG, $SITE;
 
         $mform = $this->_form;
 
-        $mform->addElement('html', '<hr>');
+        $mform->addElement('html', "<h1 class=\"login-heading mb-4\">{$SITE->fullname}</h1>");
+        $mform->addElement('html', "<hr>");
 
         $namefields = useredit_get_required_name_fields();
         foreach ($namefields as $field) {
