@@ -35,14 +35,21 @@ $string['phone']          = 'Phone';
 $string['accountcreated'] = 'Your account has been created successfully.';
 
 // form1
-$string['gender'] = 'Gender';
-$string['nationality'] = 'Nationality';
+$string['gender']               = 'Gender';
+$string['male']                 = 'Male';
+$string['female']               = 'Female';
+$string['selectagender']        = 'Select a Gender';
+$string['nationality']          = 'Nationality';
+$string['marital_status']       = 'Marital Status';
+$string['selectamaritalstatus'] = 'Select a Marital Status';
 
 // form2
-$string['dateofbirth'] = 'Date of birth';
+$string['dob'] = 'Date of birth';
 
 // form3
-$string['education']   = 'Education';
-$string['speciality']  = 'Speciality';
-$string['job']         = 'Job';
-$string['fullname']    = 'Full Name (Will be used for certification)';
+$string['education']           = 'Education';
+$string['selectaeducation']    = 'Select an Education';
+$string['speciality']          = 'Speciality';
+$string['job']                 = 'Job';
+$string['fullname']            = 'Full Name (Will be used for certification)';
+$string['sitepolicyagreement'] = 'I agree to the site policy';

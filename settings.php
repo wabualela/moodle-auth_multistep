@@ -14,36 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once "$CFG->dirroot/user/profile/lib.php";
-
 /**
- * functions for the multistep authentication plugin
+ * TODO describe file settings
  *
  * @package    auth_multistep
  * @copyright  2024 Wail Abualela wailabualela@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function multistep_extend_navigation(global_navigation $navigation) {
-    global $PAGE;
 
-    $PAGE->requires->css('/auth/multistep/styles.css');
-}
+defined('MOODLE_INTERNAL') || die;
 
+if ($ADMIN->fulltree) {
 
-/**
- * Adds code snippet to a moodle form object for custom profile fields that
- * should appear on the signup page
- * @param MoodleQuickForm $mform moodle form object
- */
-function profile_signup_fields_by_shortnames(MoodleQuickForm $mform, array $shortnames = []) : void {
+    // $settings->add(new admin_setting_configcheckbox(
+    //     'auth_multistepsignup/enable',
+    //     get_string('enableplugin', 'auth_multistepsignup'),
+    //     get_string('enableplugin_desc', 'auth_multistepsignup'),
+    //     1
+    // ));
 
-    if ($fields = profile_get_signup_fields()) {
-        foreach ($fields as $field) {
-            if (! in_array($field->object->field->shortname, $shortnames)) {
-                continue;
-            }
-            $field->object->edit_field($mform);
-        }
     }
-}

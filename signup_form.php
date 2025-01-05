@@ -24,41 +24,130 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/formslib.php');
-require_once($CFG->dirroot . '/user/profile/lib.php');
-require_once($CFG->dirroot . '/user/editlib.php');
-require_once('lib.php');
+require_once "$CFG->libdir/formslib.php";
+require_once "$CFG->dirroot/user/profile/lib.php";
+require_once "$CFG->dirroot/user/editlib.php";
+require_once "lib.php";
 
-class login_signup_form extends moodleform implements renderable, templatable
-    {
-    protected $step;
+class login_signup_form extends moodleform implements renderable, templatable {
 
-    function definition()
-        {
-        global $USER, $CFG;
+    public function definition() {
+        global $USER, $CFG, $SESSION;
 
         $mform = $this->_form;
 
-        $this->step = optional_param('step', 1, PARAM_INT);
+        $mform->addElement('html', '<hr>');
 
-        switch ($this->step) {
-            case 1:
-                $this->step1_fields($mform);
-                break;
-
-            case 2:
-                $this->step2_fields($mform);
-                break;
-
-            case 3:
-                $this->step3_fields($mform);
-                break;
+        $namefields = useredit_get_required_name_fields();
+        foreach ($namefields as $field) {
+            $mform->addElement('text', $field, get_string($field), 'maxlength="100" size="30"');
+            $mform->setType($field, core_user::get_property_type('firstname'));
+            $stringid = 'missing' . $field;
+            if (! get_string_manager()->string_exists($stringid, 'moodle')) {
+                $stringid = 'required';
             }
-
+            $mform->addRule($field, get_string($stringid), 'required', null, 'client');
         }
 
-    function export_for_template(renderer_base $output)
-        {
+        $mform->addElement('text', 'phone1', get_string('phone1'), 'maxlength="100" size="25"');
+        $mform->setType('phone1', core_user::get_property_type('phone1'));
+        $mform->addRule('phone1', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('phone1');
+
+        $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="25"');
+        $mform->setType('email', core_user::get_property_type('email'));
+        $mform->addRule('email', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('email');
+
+        $mform->addElement('text', 'email2', get_string('emailagain'), 'maxlength="100" size="25"');
+        $mform->setType('email2', core_user::get_property_type('email'));
+        $mform->addRule('email2', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('email2');
+
+        if (! empty($CFG->passwordpolicy)) {
+            $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
+        }
+        $mform->addElement('password', 'password', get_string('password'), [
+            'maxlength' => MAX_PASSWORD_CHARACTERS,
+            'size' => 12,
+            'autocomplete' => 'new-password'
+        ]);
+        $mform->setType('password', core_user::get_property_type('password'));
+        $mform->addRule('password', get_string('missingpassword'), 'required', null, 'client');
+        $mform->addRule(
+            'password',
+            get_string('maximumchars', '', MAX_PASSWORD_CHARACTERS),
+            'maxlength',
+            MAX_PASSWORD_CHARACTERS,
+            'client'
+        );
+
+        if (signup_captcha_enabled()) {
+            $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'));
+            $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
+            $mform->closeHeaderBefore('recaptcha_element');
+        }
+
+        // Hook for plugins to extend form definition.
+        core_login_extend_signup_form($mform);
+
+        $mform->addElement('html', '<hr>');
+
+        // buttons
+        $this->set_display_vertical();
+        $this->add_action_buttons(true, get_string('next'));
+
+    }
+
+    public function definition_after_data() {
+        $mform = $this->_form;
+        $mform->applyFilter('username', 'trim');
+
+        // Trim required name fields.
+        foreach (useredit_get_required_name_fields() as $field) {
+            $mform->applyFilter($field, 'trim');
+        }
+    }
+
+    /**
+     * Validate user supplied data on the signup form.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Extend validation for any form extensions from plugins.
+        $errors = array_merge($errors, core_login_validate_extend_signup_form($data));
+
+        if (signup_captcha_enabled()) {
+            $recaptchaelement = $this->_form->getElement('recaptcha_element');
+            if (! empty($this->_form->_submitValues['g-recaptcha-response'])) {
+                $response = $this->_form->_submitValues['g-recaptcha-response'];
+                if (! $recaptchaelement->verify($response)) {
+                    $errors['recaptcha_element'] = get_string('incorrectpleasetryagain', 'auth');
+                }
+            } else {
+                $errors['recaptcha_element'] = get_string('missingrecaptchachallengefield');
+            }
+        }
+
+        $authplugin = new auth_plugin_multistep();
+        $errors += $authplugin->signup_validate_data($data, $files);
+
+        return $errors;
+    }
+
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @return array
+     */
+    public function export_for_template(renderer_base $output) {
         ob_start();
         $this->display();
         $formhtml = ob_get_contents();
@@ -67,123 +156,7 @@ class login_signup_form extends moodleform implements renderable, templatable
             'formhtml' => $formhtml
         ];
         return $context;
-        }
-
-    public function step1_fields(&$mform)
-        {
-        global $CFG;
-
-        //First name & Last name
-        $namefields = useredit_get_required_name_fields();
-        foreach ($namefields as $field) {
-            $mform->addElement('text', $field, get_string($field), 'maxlength="100" size="30"');
-            $mform->setType($field, core_user::get_property_type('firstname'));
-            $stringid = 'missing' . $field;
-            if (! get_string_manager()->string_exists($stringid, 'moodle')) {
-                $stringid = 'required';
-                }
-            $mform->addRule($field, get_string($stringid), 'required', null, 'client');
-            }
-
-        //sex
-        $sex = ['ذكر', 'انثي'];
-        $mform->addElement('select', 'sex', get_string('gender', 'auth_multistep'), $sex, ['style' => 'width:100%']);
-
-        //nationality
-        $nationality             = get_string_manager()->get_list_of_countries();
-        $default_nationality[''] = get_string('selectacountry');
-        $nationality             = array_merge($default_nationality, $nationality);
-        $mform->addElement('select', 'nationality', get_string('nationality', 'auth_multistep'), $nationality, ['style' => 'width:100%']);
-
-        if (! empty($CFG->country)) {
-            $mform->setDefault('nationality', $CFG->country);
-            } else {
-            $mform->setDefault('nationality', '');
-            }
-        //Date of birth
-        $mform->addElement('date_selector', 'assesstimefinish', get_string('dateofbirth', 'auth_multistep'));
-        //Marital status
-        $marital_status = ['male', 'female'];
-        $mform->addElement('select', 'country', get_string('country'), $marital_status, ['style' => 'width:100%']);
-
-        //City
-        $mform->addElement('text', 'city', get_string('city'), 'maxlength="120" size="20"');
-        $mform->setType('city', core_user::get_property_type('city'));
-        if (! empty($CFG->defaultcity)) {
-            $mform->setDefault('city', $CFG->defaultcity);
-            }
-
-        //County
-        $country             = get_string_manager()->get_list_of_countries();
-        $default_country[''] = get_string('selectacountry');
-        $country             = array_merge($default_country, $country);
-        $mform->addElement('select', 'country', get_string('country'), $country, ['style' => 'width:100%']);
-
-        if (! empty($CFG->country)) {
-            $mform->setDefault('country', $CFG->country);
-            } else {
-            $mform->setDefault('country', '');
-            }
-
-
-        $mform->addElement('hidden', 'step', $this->step + 1);
-        $mform->setType('step', PARAM_INT);
-
-        // buttons
-        $this->set_display_vertical();
-        $mform->addElement('submit', 'next', get_string('next', 'auth_multistep'));
-
-        // $this->add_action_buttons(true, get_string('next', 'auth_multistep'));
-
-        }
-
-    public function step2_fields(&$mform)
-        {
-        // Phone
-        $mform->addElement('float', 'phone1', get_string('phone1'), ['maxlength' => '120', 'size' => '20', 'style' => 'width:100%']);
-        $mform->setType('phone1', core_user::get_property_type('phone1'));
-
-        // education
-        $education = [
-            'غير ذلك',
-            'الاعدادية المتوسطة',
-            'ثانوية  ',
-            'دبلوم',
-            'بكالريوس',
-            'ماجستير',
-            'دكتوراه',
-        ];
-        $mform->addElement('select', 'education', get_string('education', 'auth_multistep'), $education, ['style' => 'width:100%']);
-
-        // Speciality
-        $mform->addElement('float', 'speciality', get_string('speciality', 'auth_multistep'), ['maxlength' => '120', 'size' => '20', 'style' => 'width:100%']);
-        $mform->setType('speciality', PARAM_TEXT);
-
-        // Job
-        $mform->addElement('float', 'job', get_string('job', 'auth_multistep'), ['maxlength' => '120', 'size' => '20', 'style' => 'width:100%']);
-        $mform->setType('job', PARAM_TEXT);
-
-
-        $mform->addElement('hidden', 'step', $this->step + 1);
-        $mform->setType('step', PARAM_INT);
-
-        // buttons        
-        $this->set_display_vertical();
-        $this->add_action_buttons(true, get_string('next', 'auth_multistep'));
-
-        }
-
-    public function step3_fields(&$mform)
-        {
-
-        // full name (certificaitons)
-        $mform->addElement('float', 'fullname', get_string('fullname', 'auth_multistep'), ['maxlength' => '120', 'size' => '20', 'style' => 'width:100%']);
-        $mform->setType('fullname', PARAM_TEXT);
-        //- email
-        //- password
-        //- username
-        //- site policy
-
-        }
     }
+}
+
 

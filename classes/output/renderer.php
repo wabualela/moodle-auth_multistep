@@ -14,36 +14,44 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once "$CFG->dirroot/user/profile/lib.php";
+namespace auth_multistep\output;
+
+use context_course;
+use core_renderer;
+use moodleform;
 
 /**
- * functions for the multistep authentication plugin
+ * Renderer for Multi-Step Signup Form
  *
  * @package    auth_multistep
  * @copyright  2024 Wail Abualela wailabualela@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class renderer extends core_renderer
+    {
 
-function multistep_extend_navigation(global_navigation $navigation) {
-    global $PAGE;
+    /**
+     * Render the login signup form into a nice template for the theme.
+     *
+     * @param moodleform $form
+     * @return string
+     */
+    public function render_login_signup_form($form)
+        {
+        global $SITE;
 
-    $PAGE->requires->css('/auth/multistep/styles.css');
-}
-
-
-/**
- * Adds code snippet to a moodle form object for custom profile fields that
- * should appear on the signup page
- * @param MoodleQuickForm $mform moodle form object
- */
-function profile_signup_fields_by_shortnames(MoodleQuickForm $mform, array $shortnames = []) : void {
-
-    if ($fields = profile_get_signup_fields()) {
-        foreach ($fields as $field) {
-            if (! in_array($field->object->field->shortname, $shortnames)) {
-                continue;
+        $context = $form->export_for_template($this);
+        $url     = $this->get_logo_url();
+        if ($url) {
+            $url = $url->out(false);
             }
-            $field->object->edit_field($mform);
+        $context['logourl']  = $url;
+        $context['sitename'] = format_string(
+            $SITE->fullname,
+            true,
+            ['context' => context_course::instance(SITEID), "escape" => false]
+        );
+
+        return $this->render_from_template('auth_multistep/signup_form_layout', $context);
         }
     }
-}
