@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once "$CFG->libdir/formslib.php";
 require_once "$CFG->dirroot/user/profile/lib.php";
 require_once "$CFG->dirroot/user/editlib.php";
-require_once "lib.php";
+require_once "$CFG->dirroot/auth/multistep/lib.php";
 
 class login_signup_form extends moodleform {
 
@@ -50,10 +50,7 @@ class login_signup_form extends moodleform {
             $mform->addRule($field, get_string($stringid), 'required', null, 'client');
         }
 
-        $mform->addElement('text', 'phone1', get_string('phone1'), 'maxlength="100" size="25"');
-        $mform->setType('phone1', core_user::get_property_type('phone1'));
-        $mform->addRule('phone1', get_string('missingemail'), 'required', null, 'client');
-        $mform->setForceLtr('phone1');
+        profile_signup_fields_by_shortnames($mform, ['certname']);
 
         $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="25"');
         $mform->setType('email', core_user::get_property_type('email'));

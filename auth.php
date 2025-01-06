@@ -106,6 +106,8 @@ class auth_plugin_multistep extends auth_plugin_base {
         }
 
         $user->id        = user_create_user($user, false, false);
+        profile_save_data($user);
+        
         $SESSION->userid = $user->id;
         $SESSION->step   = 2;
 

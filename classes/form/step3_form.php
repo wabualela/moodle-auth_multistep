@@ -17,6 +17,7 @@
 namespace auth_multistep\form;
 
 require_once "$CFG->libdir/formslib.php";
+require_once "$CFG->dirroot/auth/multistep/lib.php";
 
 /**
  * Class form3_form
@@ -34,7 +35,12 @@ class step3_form extends \moodleform {
         $mform->addElement('html', "<h1 class=\"login-heading mb-4\">{$SITE->fullname}</h1>");
         $mform->addElement('html', "<hr>");
 
-        profile_signup_fields_by_shortnames($mform, ['certname', 'education_level', 'current_job']);
+        profile_signup_fields_by_shortnames($mform, ['education_level', 'current_job', 'marital_status']);
+
+        $mform->addElement('text', 'phone1', get_string('phone1'), 'maxlength="100" size="25"');
+        $mform->setType('phone1', \core_user::get_property_type('phone1'));
+        $mform->addRule('phone1', get_string('missingemail'), 'required', null, 'client');
+        $mform->setForceLtr('phone1');
 
         $manager = new \core_privacy\local\sitepolicy\manager();
         if ($manager->is_defined()) {

@@ -66,7 +66,6 @@ if ($mform_signup->is_cancelled()) {
             $user->profile_field_nationality = $data->profile_field_nationality;
             $user->profile_field_gender = $data->profile_field_gender;
             $user->profile_field_dob = $data->profile_field_dob;
-            $user->profile_field_marital_status = $data->profile_field_marital_status;
             $DB->update_record('user', $user);
             profile_save_data($user);
             $SESSION->step = 3;
@@ -74,8 +73,8 @@ if ($mform_signup->is_cancelled()) {
         case 3:
             $user->profile_field_education_level = $data->profile_field_education_level;
             $user->profile_field_current_job = $data->profile_field_current_job;
-            $user->profile_field_certname = $data->profile_field_certname;
-
+            $user->phone1 = $data->phone1;
+            $user->profile_field_marital_status = $data->profile_field_marital_status;
             profile_save_data($user);
             $manager = new \core_privacy\local\sitepolicy\manager();
             if ($manager->is_defined()) {
@@ -84,7 +83,8 @@ if ($mform_signup->is_cancelled()) {
 
             $SESSION->step = 0;
             $SESSION->userid = 0;
-            
+            $confirmationurl = null;
+
             if (! send_confirmation_email($user, $confirmationurl)) {
                 throw new \moodle_exception('auth_emailnoemail', 'auth_email');
             }
