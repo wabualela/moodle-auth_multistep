@@ -119,10 +119,6 @@ class auth_plugin_multistep extends auth_plugin_base {
         // Trigger event.
         \core\event\user_created::create_from_userid($user->id)->trigger();
 
-        if (! send_confirmation_email($user, $confirmationurl)) {
-            throw new \moodle_exception('auth_emailnoemail', 'auth_email');
-        }
-
         redirect(new moodle_url("$CFG->wwwroot/auth/multistep/signup.php"));
     }
 

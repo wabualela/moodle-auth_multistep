@@ -84,6 +84,11 @@ if ($mform_signup->is_cancelled()) {
 
             $SESSION->step = 0;
             $SESSION->userid = 0;
+            
+            if (! send_confirmation_email($user, $confirmationurl)) {
+                throw new \moodle_exception('auth_emailnoemail', 'auth_email');
+            }
+
             $emailconfirm = get_string('emailconfirm');
             $PAGE->navbar->add($emailconfirm);
             $PAGE->set_title($emailconfirm);
