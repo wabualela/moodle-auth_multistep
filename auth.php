@@ -123,11 +123,7 @@ class auth_plugin_multistep extends auth_plugin_base {
             throw new \moodle_exception('auth_emailnoemail', 'auth_email');
         }
 
-        if ($notify) {
-            redirect(new moodle_url("$CFG->wwwroot/auth/multistep/signup.php"));
-        } else {
-            return true;
-        }
+        redirect(new moodle_url("$CFG->wwwroot/auth/multistep/signup.php"));
     }
 
     /**
