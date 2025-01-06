@@ -40,15 +40,11 @@ class step2_form extends moodleform implements renderable, templatable {
         $mform->addElement('html', "<h1 class=\"login-heading mb-4\">{$SITE->fullname}</h1>");
         $mform->addElement('html', "<hr>");
 
-        profile_signup_fields_by_shortnames($mform, ['dob', 'marital_status', 'gender']);
+        profile_signup_fields_by_shortnames($mform, ['dob', 'marital_status', 'gender', 'nationality']);
 
         $country             = get_string_manager()->get_list_of_countries();
         $default_country[''] = get_string('selectacountry');
         $country             = array_merge($default_country, $country);
-
-        $mform->addElement('select', 'profile_field_nationality', get_string('nationality', 'auth_multistep'), $country);
-        $mform->setType('profile_field_nationality', PARAM_TEXT);
-        $mform->addRule('profile_field_nationality', get_string('required'), 'required', null, 'client');
 
         $mform->addElement('select', 'country', get_string('country'), $country);
         $mform->addRule('country', get_string('required'), 'required', null, 'client');
