@@ -69,7 +69,7 @@ class login_signup_form extends moodleform {
             $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
         }
         $mform->addElement('password', 'password', get_string('password'), [
-            'maxlength' => MAX_PASSWORD_CHARACTERS,
+            'maxlength' => 100,
             'size' => 12,
             'autocomplete' => 'new-password'
         ]);
@@ -77,9 +77,9 @@ class login_signup_form extends moodleform {
         $mform->addRule('password', get_string('missingpassword'), 'required', null, 'client');
         $mform->addRule(
             'password',
-            get_string('maximumchars', '', MAX_PASSWORD_CHARACTERS),
+            get_string('maximumchars', '', 100),
             'maxlength',
-            MAX_PASSWORD_CHARACTERS,
+            100,
             'client'
         );
 
